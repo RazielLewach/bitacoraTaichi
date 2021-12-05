@@ -1,0 +1,84 @@
+<html style="background-color:#F54444;">
+	<canvas id="myCanvas" width="1280" height="720" style="border:1px solid #000000; background-color:#000000;">
+	</canvas>
+</html>
+<script>
+	var canvas = document.getElementById('myCanvas'),
+	context = canvas.getContext('2d');
+	var dirAux10 = 0;
+	var iDialogo = 0; // Cuál diálogo we.
+	var cntText = 0; // Texto por partes.
+
+	function loop() {
+		update();
+		draw();
+	}
+	setInterval(loop, 16);
+	
+	// Step.
+	function update() {
+		dirAux10 += 0.0005;
+		if (dirAux10 >= 360) dirAux10 -= 360;
+		if (cntText < 500) cntText += 0.2;
+	}
+
+	// Draw.
+	function draw() {
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		
+		// Taichi.
+		var imgTaichi = new Image();
+		imgTaichi.src = 'https://i.imgur.com/BB6TnQT.png';
+		context.drawImage(imgTaichi,100,150);
+		
+		// Yveltal.
+		var imgYveltal = new Image();
+		imgYveltal.src = 'https://i.imgur.com/a5r9F1B.png';
+		context.drawImage(imgYveltal,600,-100 + 100*Math.cos(dirAux10*180/Math.PI));
+		
+		// Caja de diálogos.
+		context.beginPath();
+		context.lineWidth = "100";
+		context.strokeStyle = "#111111";
+		context.rect(70, 650, 1140, 2);
+		context.stroke();
+		context.beginPath();
+		context.lineWidth = "4";
+		context.strokeStyle = "#AA2222";
+		context.rect(20, 600, 1240, 100);
+		context.stroke();
+		
+		// Diálogos.
+		var _text = "";
+		if (iDialogo == 0) _text = "Ola k ase";
+		context.fillStyle = "#FFFFFF";
+		context.font = "30px Arial";
+		context.fillText(_text.substr(0,cntText), 40, 660);
+	}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
