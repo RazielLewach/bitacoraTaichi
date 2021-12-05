@@ -1,7 +1,11 @@
 <html style="background-color:#F54444;">
-	<canvas id="myCanvas" width="1280" height="720" style="border:1px solid #000000; background-color:#000000;">
-	</canvas>
+<head>
+</head>
+<body>
+	<canvas id="myCanvas" width="1280" height="720" style="border:1px solid #000000; background-color:#000000;"/>
+</body>
 </html>
+
 <script>
 	var canvas = document.getElementById('myCanvas'),
 	context = canvas.getContext('2d');
@@ -50,7 +54,7 @@
 		
 		// Diálogos.
 		var _text = "";
-		if (iDialogo == 0) _text = "Ola k ase Ola k ase Ola k ase Ola k ase Ola k ase";
+		if (iDialogo == 0) _text = "Ola k ase Ola k ase Ola k ase Ola k ase";
 		context.fillStyle = "#FFFFFF";
 		context.font = "30px Arial";
 		context.fillText(_text.substr(0,cntText), 40, 660);
