@@ -1,17 +1,44 @@
-<html style="background-color:#F54444;">
+<html style="background-color:#000000;">
 <head>
 </head>
 <body>
-	<canvas id="myCanvas" width="1280" height="720" style="border:1px solid #000000; background-color:#000000;"/>
+	<canvas id="myCanvas" width="1280" height="720" style="display:block; margin-left:auto; margin-right:auto; border:1px solid #000000; background-size:100%;
+	background-image:url('https://static.wikia.nocookie.net/pokemon-rol-ffl/images/1/16/Anime-forest-landscape-trees-sunbeam-plants-anime-16571.jpg/revision/latest?cb=20181216124623&path-prefix=es');"/>
+	<iframe width="560" height="315" src="https://www.youtube.com/embed/b1uH4BnswKQ"
+		title="YouTube video player" frameborder="0"
+		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+	</iframe>
 </body>
 </html>
 
 <script>
-	var canvas = document.getElementById('myCanvas'),
+	var canvas = document.getElementById('myCanvas');
 	context = canvas.getContext('2d');
+	canvas.addEventListener('click', click, false);
+	canvas.addEventListener("mousemove", () => {
+		inBallHover = event.clientX >= xBall+20 && event.clientX <= xBall+130 && event.clientY >= yBall-70 && event.clientY <= yBall+50;
+	});
+
+	var txtDialogo = ""; // El texto.
+	var colDialogo = "#FFFFF"; // El color we.
+	var dirAux1 = 0;
+	var dirAux2 = 0;
 	var dirAux10 = 0;
-	var iDialogo = 0; // Cuál diálogo we.
+	var dirAux20 = 0;
+	var iDialogo = 23; // Cuál diálogo we. Inicia en 0.
 	var cntText = 0; // Texto por partes.
+	var isBold = false; // ¿Texto bold?
+	var iHabla = -1; // ¿Quién habla?
+	var scaleBall = 0;
+	var angleBall = 0;
+	var angleBallAux = 0; // Gestionar rebotes.
+	var xBall = 150;
+	var yBall = 350;
+	var iAnimationBall = 0;
+	var dirAnimation1 = 0;
+	var inBallHover = false;
+	var scaleYveltal = 1;
+	var yYveltal = 300;
 
 	function loop() {
 		update();
@@ -21,43 +48,236 @@
 	
 	// Step.
 	function update() {
-		dirAux10 += 0.0005;
+		dirAux1 += 1;
+		if (dirAux1 >= 360) dirAux1 -= 360;
+		dirAux2 += 2;
+		if (dirAux2 >= 360) dirAux2 -= 360;
+		dirAux10 += 10;
 		if (dirAux10 >= 360) dirAux10 -= 360;
-		if (cntText < 500) cntText += 0.2;
+		dirAux20 += 20;
+		if (dirAux20 >= 360) dirAux20 -= 360;
+		if (cntText < 500) cntText += 0.5;
+	}
+	
+	// Interact.
+	function click() {
+		// Avanza de diálogo.
+		if (iDialogo != 23 && cntText > txtDialogo.length) {
+			++iDialogo;
+			cntText = 0;
+		}
+		
+		// Click a la ball.
+		if (iAnimationBall == 0 && inBallHover) {
+			iAnimationBall = 1;
+		}
 	}
 
 	// Draw.
 	function draw() {
 		context.clearRect(0, 0, canvas.width, canvas.height);
+		var _y;
+		
+		// Garchomp.
+		var imgGarchomp = new Image();
+		imgGarchomp.src = 'https://i.imgur.com/gwbp4gW.png';
+		_y = 100 + 10*Math.cos(dirAux2*Math.PI/180);
+		context.drawImage(imgGarchomp,10,_y);
 		
 		// Taichi.
 		var imgTaichi = new Image();
 		imgTaichi.src = 'https://i.imgur.com/BB6TnQT.png';
-		context.drawImage(imgTaichi,100,150);
+		_y = 150;
+		if (iHabla == 0) _y += 10+10*Math.cos(dirAux20*Math.PI/180)
+		context.drawImage(imgTaichi,10,_y);
 		
 		// Yveltal.
 		var imgYveltal = new Image();
 		imgYveltal.src = 'https://i.imgur.com/a5r9F1B.png';
-		context.drawImage(imgYveltal,600,-100 + 100*Math.cos(dirAux10*180/Math.PI));
 		
-		// Caja de diálogos.
-		context.beginPath();
-		context.lineWidth = "100";
-		context.strokeStyle = "#111111";
-		context.rect(70, 650, 1140, 2);
-		context.stroke();
-		context.beginPath();
-		context.lineWidth = "4";
-		context.strokeStyle = "#AA2222";
-		context.rect(20, 600, 1240, 100);
-		context.stroke();
+		if (scaleYveltal > 0) {
+			yYveltal = 300;
+			if (iHabla == 1) yYveltal += 10*Math.cos(dirAux20*Math.PI/180);
+			else yYveltal += 100*Math.cos(dirAux1*Math.PI/180);
+		}
+		
+		context.save();
+		context.translate(+1000,+yYveltal);
+		context.scale(scaleYveltal,scaleYveltal);
+		context.drawImage(imgYveltal,-350,-425);
+		context.restore();
+		
+		// Pokéball.
+		if (iDialogo == 23) {
+			scaleBall = Math.min(scaleBall+0.05,1);
+			//angleBall++;
+			
+			// Anima la bola.
+			// Hazle click.
+			if (iAnimationBall == 0) {
+				dirAnimation1 = 0;
+				if (inBallHover) {
+					xBall = 150;
+					yBall = 450 + 10*Math.cos(dirAux10*Math.PI/180);
+				}
+				else {
+					xBall = 150;
+					yBall = 450;
+				}
+			}
+			// Se lanza.
+			else if (iAnimationBall == 1) {
+				dirAnimation1 = Math.min(dirAnimation1+2,180);
+				xBall = 550 - 400*Math.cos(dirAnimation1*Math.PI/180);
+				yBall = 450 - 400*Math.sin(dirAnimation1*Math.PI/180);
+				
+				if (dirAnimation1 == 180) iAnimationBall = 2;
+			}
+			// Encoge Yveltal.
+			else if (iAnimationBall == 2) {
+				xBall = 1000;
+				if (yBall > yYveltal) yBall -= 10;
+				else yBall += 10;
+				if (Math.abs(yBall-yYveltal) < 10) yBall = yYveltal;
+				scaleYveltal = Math.max(scaleYveltal-0.02,0);
+				if (scaleYveltal == 0) iAnimationBall = 3;
+				
+				angleBall = 0;
+				angleBallAux = 0;
+			}
+			// Tiemble primero.
+			else if (iAnimationBall == 3) {
+				yYveltal = Math.min(yYveltal+10,600);
+				yBall = yYveltal;
+				
+				if (yBall == 600) {
+					angleBallAux += 10;
+					if (angleBallAux >= 360) {
+						iAnimationBall = 4;
+						angleBallAux = 0;
+					}
+					angleBall = 90*Math.sin(angleBallAux*Math.PI/180);
+				}
+			}
+			// Espera.
+			else if (iAnimationBall == 4) {
+				angleBallAux += 10;
+				if (angleBallAux >= 360) {
+					iAnimationBall = 5;
+					angleBallAux = 0;
+				}
+			}
+			// Tiemble segundo.
+			else if (iAnimationBall == 5) {
+				angleBallAux += 10;
+				if (angleBallAux >= 360) {
+					iAnimationBall = 6;
+					angleBallAux = 0;
+				}
+				angleBall = 90*Math.sin(angleBallAux*Math.PI/180);
+			}
+			// Espera.
+			else if (iAnimationBall == 6) {
+				angleBallAux += 10;
+				if (angleBallAux >= 360) {
+					iAnimationBall = 7;
+					angleBallAux = 0;
+				}
+			}
+			// Tiemble tercero.
+			else if (iAnimationBall == 7) {
+				angleBallAux += 10;
+				if (angleBallAux >= 360) {
+					iAnimationBall = 8;
+					iDialogo = 24;
+				}
+				angleBall = 90*Math.sin(angleBallAux*Math.PI/180);
+			}
+			
+			// Dibuja la bola.
+			var imgBall = new Image();
+			imgBall.src = 'https://i.imgur.com/0iDeokc.png';
+			context.save();
+			context.translate(+xBall,+yBall);
+			context.scale(scaleBall,scaleBall);
+			context.rotate(+angleBall*Math.PI/180);
+			context.drawImage(imgBall,-50,-70);
+			context.restore();
+		}
 		
 		// Diálogos.
-		var _text = "";
-		if (iDialogo == 0) _text = "Ola k ase Ola k ase Ola k ase Ola k ase";
-		context.fillStyle = "#FFFFFF";
-		context.font = "30px Arial";
-		context.fillText(_text.substr(0,cntText), 40, 660);
+		txtDialogo = "";
+		colDialogo = "#444444";
+		
+		// Escena: captura de Yveltal.
+		if (iDialogo == 0) 			setDialogo(-1,"#444444",false,"Yveltal vio cómo el castaño sacaba una Pokéball vacía desde su bolsillo,");
+		else if (iDialogo ==   1)	setDialogo(-1,"#444444",false,"lo cual hizo que se incorporara sin mucho afán aparente de pelear,");
+		else if (iDialogo ==   2) 	setDialogo(-1,"#444444",false,"ya que estaba muy cansado luego de lidiar contra Xerneas y luego contra aquel trío de tercos.");
+		else if (iDialogo ==   3) 	setDialogo(+1,"#444444",true,"“¡Ja! Así que hablabas en serio cuando decías que intentarías capturarme.”");
+		else if (iDialogo ==   4) 	setDialogo(-1,"#444444",false,"Expresó el ave, reflejando aún arrogancia a pesar de su estado actual.");
+		else if (iDialogo ==   5) 	setDialogo(+0,"#4169E1",false,"Como Entrenador y futuro Campeón, no puedo permitirte que causes destrucción a tus anchas.");
+		else if (iDialogo ==   6) 	setDialogo(+0,"#4169E1",false,"Sin importar si alguno de nosotros te captura, o si huyes, me rebelaré ante ti por todos los que heriste.");
+		else if (iDialogo ==   7) 	setDialogo(-1,"#444444",false,"Respondió con dureza, presionando el artefacto rojo y blanco en su mano derecha.");
+		else if (iDialogo ==   8) 	setDialogo(+1,"#444444",true,"“Hmm…¿Puedo saber tu nombre?”");
+		else if (iDialogo ==   9) 	setDialogo(-1,"#444444",false,"Taichi se extrañó por la pregunta, pero respondería de todos modos.");
+		else if (iDialogo ==  10) 	setDialogo(+0,"#4169E1",false,"Yagami…Taichi.");
+		else if (iDialogo ==  11) 	setDialogo(-1,"#444444",false,"Yveltal se incorporó por completo, manteniendo la vista fija en el joven.");
+		else if (iDialogo ==  12) 	setDialogo(-1,"#444444",false,"Garchomp seguía en guardia en caso de cualquier eventualidad.");
+		else if (iDialogo ==  13) 	setDialogo(+1,"#444444",true,"“Con que Taichi…Bien. Veamos si eres digno.”");
+		else if (iDialogo ==  14) 	setDialogo(+1,"#444444",true,"“¿Crees poder controlar las tinieblas del Pokémon de la Destrucción?”");
+		else if (iDialogo ==  15) 	setDialogo(-1,"#444444",false,"preguntó con solemnidad, alzando la voz y sus alas. Sin embargo, no se movió.");
+		else if (iDialogo ==  16) 	setDialogo(-1,"#444444",false,"No iba a esquivar la esfera.");
+		else if (iDialogo ==  17) 	setDialogo(-1,"#444444",false,"Taichi sonrió.");
+		else if (iDialogo ==  18) 	setDialogo(+0,"#4169E1",false,"Ya te lo dije cuando me hablaste por primera vez.");
+		else if (iDialogo ==  19) 	setDialogo(+0,"#4169E1",false,"Lidié por demasiado tiempo con una voz en mi cabeza");
+		else if (iDialogo ==  20) 	setDialogo(+0,"#4169E1",false,"como para dejarme influenciar nuevamente por otra.");
+		else if (iDialogo ==  21) 	setDialogo(+0,"#4169E1",false,"No soy el mismo de antes.");
+		else if (iDialogo ==  22) 	setDialogo(-1,"#444444",false,"Y dicho eso, la Pokéball voló por los aires en dirección a la piel rojinegra...");
+		else if (iDialogo ==  24) 	setDialogo(-1,"#444444",false,"... encerrándola al contacto. ¿El resto? Tensión pura.");
+		
+		// Escena: 
+		
+		if (txtDialogo != "") {
+			// Caja de diálogos.
+			context.beginPath();
+			context.lineWidth = "100";
+			context.strokeStyle = "#FFFFFF";
+			context.rect(70, 650, 1140, 2);
+			context.stroke();
+			context.beginPath();
+			context.lineWidth = "4";
+			context.strokeStyle = "#AA2222";
+			context.rect(20, 600, 1240, 100);
+			context.stroke();
+		
+			// El texto del diálogo.
+			context.fillStyle = colDialogo;
+			context.font = "25px Arial";
+			if (isBold) context.font = "bold 25px Arial";
+			context.fillText(txtDialogo.substr(0,cntText), 40, 640);
+		
+			// Click.
+			if (cntText > txtDialogo.length) {
+				context.beginPath();
+				context.lineWidth = "50";
+				context.strokeStyle = "#000000";
+				context.rect(1220, 630, 10, 40);
+				context.stroke();
+				
+				if (iDialogo == 0) context.fillText("Click para continuar", 930, 690);
+				var imgClick = new Image();
+				if (dirAux10 > 180) imgClick.src = 'https://i.imgur.com/995OOGy.png';
+				else imgClick.src = 'https://i.imgur.com/zr0CIol.png';
+				context.drawImage(imgClick,1210,620);
+			}
+		}
+	}
+	
+	function setDialogo(ih,color,bold,text) {
+		iHabla = ih;
+		colDialogo = color;
+		isBold = bold;
+		txtDialogo = text;
 	}
 </script>
 
